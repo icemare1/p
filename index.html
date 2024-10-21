@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片展示网站</title>
+    <style>
+        body {
+            background-color: #fff;
+            color: #000;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* 居中 */
+            justify-content: center; /* 居中 */
+            height: 100vh; /* 让页面占满整个视口 */
+            box-sizing: border-box;
+        }
+
+        /* 右上角的LOGO和搜索栏 */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 5px; /* Logo 靠下 */
+        }
+
+        .logo {
+            width: 150px;
+        }
+
+        .search-bar input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            width: 250px;
+        }
+
+        /* 横向并排的网站链接 */
+        .menu {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .menu a {
+            color: #fff;
+            text-decoration: none;
+            background-color: #ff8c00; /* 深橙色 */
+            padding: 10px;
+            border-radius: 50px;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu a:hover {
+            background-color: #ffa500; /* 悬停时更亮一点 */
+        }
+
+        /* 图片展示区 */
+        .gallery {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            margin-top: 20px; /* 适当留空 */
+        }
+
+        .gallery img {
+            max-width: 100%;
+            height: 650px; /* 固定高度 */
+            object-fit: cover; /* 保持图片不变形 */
+            border-radius: 15px;
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .gallery img.fade {
+            opacity: 0;
+            transform: scale(1.05); /* 切换时缩放一点点 */
+        }
+
+        /* 图片描述靠右 */
+        .description {
+            position: absolute;
+            right: -30%;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 9px;
+            max-width: 300px;
+            text-align: right;
+        }
+
+        /* 按钮固定在底部 */
+        .pagination {
+            position: fixed;
+            bottom: 40px; /* 调整位置，紧靠图片下方 */
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+        }
+
+        .pagination button, .pagination input {
+            padding: 10px 20px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .pagination input {
+            width: 50px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- LOGO 居中显示在图片上方 -->
+    <div class="logo-container">
+        <img src="logo.png" alt="Logo" class="logo"> <!-- 替换为你的LOGO -->
+    </div>
+
+    <!-- 右上角的搜索栏 -->
+    <div class="top-bar">
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="搜索图片...">
+        </div>
+        <!-- 横向并排的网站链接 -->
+        <div class="menu">
+            <a href="https://www.google.com" target="_blank">Google</a>
+            <a href="https://www.youtube.com" target="_blank">YouTube</a>
+            <a href="https://www.github.com" target="_blank">GitHub</a>
+        </div>
+    </div>
+
+    <!-- 图片展示区 -->
+    <div class="gallery">
+        <img src="image1.jpg" alt="Image 1" id="img-display"> <!-- 替换为实际图片路径 -->
+        <div class="description" id="description">孤独的椅子-2410</div>
+    </div>
+
+    <!-- 按钮固定在底部紧跟着图片 -->
+    <div class="pagination">
+        <button onclick="previousPage()">上一页</button>
+        <input type="number" id="page-input" min="1" value="1">
+        <button onclick="goToPage()">跳转</button>
+        <button onclick="nextPage()">下一页</button>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 10; // 假设总共有10页，你可以通过后台逻辑自动获取总页数
+        const images = [
+            { img: 'image1.jpg', description: '孤独的椅子-2410' },
+            { img: 'image2.jpg', description: '秋叶-2410' },
+            { img: 'image3.jpg', description: '银杏大道-2410' },
+            // 继续添加图片路径和描述
+        ];
+
+        let currentImageIndex = 0;
+
+        function loadImages(index) {
+            const imageDisplay = document.getElementById('img-display');
+            const descriptionDisplay = document.getElementById('description');
+
+            // 添加淡入淡出效果
+            imageDisplay.classList.add('fade');
+
+            setTimeout(() => {
+                // 根据当前页加载图片
+                const imageSet = images[index];
+                if (imageSet) {
+                    imageDisplay.src = imageSet.img;
+                    descriptionDisplay.textContent = imageSet.description;
+                }
+                // 图片加载完成后去掉fade类
+                imageDisplay.classList.remove('fade');
+            }, 1000); // 1秒后切换图片
+        }
+
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                document.getElementById('page-input').value = currentPage;
+                loadImages((currentPage - 1) % images.length);
+            }
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                document.getElementById('page-input').value = currentPage;
+                loadImages((currentPage - 1) % images.length);
+            }
+        }
+
+        function goToPage() {
+            const page = parseInt(document.getElementById('page-input').value);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                loadImages((currentPage - 1) % images.length);
+            } else {
+                alert("请输入有效的页码");
+            }
+        }
+
+        // 自动每10秒切换图片
+        function autoSwitchImages() {
+            currentImageIndex = (currentImageIndex + 1) % images.length;
+            loadImages(currentImageIndex);
+        }
+
+        setInterval(autoSwitchImages, 10000); // 每10秒切换图片
+
+        // 初始化加载第一张图片
+        loadImages(currentImageIndex);
+    </script>
+
+</body>
+</html>

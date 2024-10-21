@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>摄影展示</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            color: #000;
+        }
+
+        /* 设置 logo 居中 */
+        .logo {
+            width: 150px;
+            margin: 20px 0;
+        }
+
+        /* 链接列表样式，调整字体大小 */
+        .links {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #000;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        /* 图片展示容器 */
+        .gallery {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        /* 图片样式 */
+        .gallery img {
+            width: 100%;
+            max-height: 650px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+            opacity: 0;
+            transition: opacity 1s ease-in-out; /* 渐变效果 */
+        }
+
+        .gallery img.visible {
+            opacity: 1;
+        }
+
+        /* 图片描述，黑色字体 */
+        .description {
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #000; /* 设置为黑色字体 */
+        }
+
+        /* 图片故事 */
+        .story {
+            font-size: 12px;
+            color: gray;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* 按钮样式 */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+
+        .pagination button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .pagination button:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+
+        /* MBTI 抽签区域 */
+        .mbti-draw {
+            margin-top: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 20px;
+        }
+
+        .mbti-draw button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .mbti-result {
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Logo 居中 -->
+    <img src="logo.png" alt="Logo" class="logo">
+
+    <!-- 链接列表 -->
+    <div class="links">
+        <a href="https://heyan9.github.io/" target="_blank">何岩搜索</a>
+        <a href="https://www.dxomark.cn/" target="_blank">DxoMark</a>
+        <a href="https://dc.pconline.com.cn/" target="_blank">太平洋数码</a>
+        <a href="https://space.bilibili.com/3816626?spm_id_from=333.337.0.0" target="_blank">Links</a>
+        <a href="https://www.ysjf.com/materialLibrary" target="_blank">影视飓风</a>
+        <a href="http://www.dili360.com/" target="_blank">国家地理</a>
+    </div>
+
+    <!-- 图片展示区 -->
+    <div class="gallery">
+        <img src="image1.jpg" alt="Image 1" id="img-display" class="visible">
+        <div class="description" id="img-description">图片描述 1</div>
+        <div class="story" id="img-story">拍摄故事：这是在旅途中偶然捕捉到的一刻。</div>
+    </div>
+
+    <!-- 分页按钮 -->
+    <div class="pagination">
+        <button onclick="previousImage()" id="prev-btn" disabled>上一张</button>
+        <button onclick="nextImage()" id="next-btn">下一张</button>
+    </div>
+
+    <!-- MBTI 抽签区域 -->
+    <div class="mbti-draw">
+        <button onclick="drawMBTI()">抽取 MBTI</button>
+        <div class="mbti-result" id="mbti-result">你的 MBTI 类型会显示在这里。</div>
+    </div>
+
+    <script>
+        // 假设有多张图片及其描述和故事
+        const images = [
+             { img: 'image5.jpg', description: '太阳好大', story: '奕绍太怕夏天了哈哈，我也是' },
+             { img: 'image4.jpg', description: '桥', story: '桥驿的桥真的格外有自然的感觉' },
+            { img: 'image1.jpg', description: '孤独的椅子', story: '秋天的汨罗屈子湿地公园好看的不行' },
+            { img: 'image2.jpg', description: '逃跑', story: '长沙生态动物园，它喜欢逃跑到一边，因为这儿只有它形单影只' },
+            { img: 'image3.jpg', description: 'Hi', story: '国庆的ACC漫展，我真的特别喜欢这只' }
+        ];
+
+        let currentImageIndex = 0;
+
+        // 加载图片并应用渐变效果
+        function loadImage(index) {
+            const imgDisplay = document.getElementById('img-display');
+            const imgDescription = document.getElementById('img-description');
+            const imgStory = document.getElementById('img-story');
+
+            imgDisplay.classList.remove('visible');
+            setTimeout(() => {
+                imgDisplay.src = images[index].img;
+                imgDescription.textContent = images[index].description;
+                imgStory.textContent = images[index].story;
+                imgDisplay.classList.add('visible');
+            }, 1000); // 延迟1秒以显示渐变效果
+
+            // 设置按钮状态
+            document.getElementById('prev-btn').disabled = index === images.length - 1;
+            document.getElementById('next-btn').disabled = index === 0;
+        }
+
+        // 切换到上一张图片
+        function previousImage() {
+            if (currentImageIndex < images.length - 1) {
+                currentImageIndex++;
+                loadImage(currentImageIndex);
+            }
+        }
+
+        // 切换到下一张图片
+        function nextImage() {
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                loadImage(currentImageIndex);
+            }
+        }
+
+        // 自动每20秒跳转到上一张图片
+        setInterval(previousImage, 20000);
+
+        // 自动跳转回最后一张图片
+        setTimeout(() => {
+            if (currentImageIndex === 0) {
+                currentImageIndex = images.length - 1;
+                loadImage(currentImageIndex);
+            }
+        }, 20000);
+
+        // 初始化加载第一张图片
+        loadImage(currentImageIndex);
+
+        // MBTI 类型及描述
+        const mbtiData = [
+  { type: "INTJ", description: "战略家，逻辑性强，喜欢独立思考。", lover: "INTP, ENTP, INFJ: 这些类型能提供智力刺激，理解其独立性。" },
+  { type: "INFP", description: "理想主义者，富有同情心和创造力。", lover: "INFJ, ENFP, ISFP: 情感共鸣，支持梦想，欣赏艺术。"},
+  { type: "ENTP", description: "辩论家，充满好奇心和创新精神。", lover: "INTJ, ENTP, ENFP, INTP: 激发思想碰撞，提供挑战。"},
+  { type: "ENFP", description: "充满激情，社交活跃。", lover: "ENFJ, INFJ, ESFP, ENFP: 情感共鸣，支持梦想，喜欢热情活力。"},
+  { type: "INFJ", description: "富有洞察力，善于帮助他人。", lover: "INTJ, INFP, ENFJ, INFJ: 深度理解，共同成长。"},
+  { type: "ISFJ", description: "忠诚，重视家庭与传统。", lover: "ISFJ, ISTJ, ESFJ, ISFP: 稳定可靠，支持家庭，欣赏细心。"},
+  { type: "ESFP", description: "乐观开朗，喜欢享受生活。", lover: "ESFP, ENFP, ISFP, ESTP: 活力充沛，享受当下，欣赏艺术。"},
+  { type: "ESFJ", description: "关心他人，注重社会规范。", lover: "ESFJ, ISFJ, ENFJ, ISFP: 温暖可靠，支持社交，欣赏细心。"},
+  { type: "ENTJ", description: "果断有力，擅长领导。", lover: "INTJ, ENTP, INFJ, ENTJ: 支持目标，有共同价值观，欣赏洞察力。"},
+  { type: "ISTJ", description: "逻辑学家，务实、可靠、有组织。", lover: "ISTJ, ISFJ, INTJ, ISTP: 稳定可靠，支持传统，理解务实。"},
+  { type: "ISTP", description: "手艺人，独立、冷静，喜欢动手实践。", lover: "ISTP, INTP, ESTP, ISTJ: 独立自主，共同探索，理解实用主义。"},
+  { type: "ISFP", description: "冒险家，敏感、艺术，注重体验。", lover: "ISFP, INFP, ESFP, ISFJ: 支持艺术，情感共鸣，欣赏细腻感受。"},
+  { type: "INTP", description: "逻辑学家，聪明、好奇，喜欢理论思考。", lover: "INTP, INTJ, ENTP, ISTP: 智力上的伙伴，理解抽象思维。"},
+  { type: "ESTP", description: "实干家，活力充沛、喜欢刺激，善于社交。", lover: "ESTP, ESFP, ISTP, ESTJ: 冒险精神，共同体验，理解行动力。"},
+  { type: "ESTJ", description: "执行者，有组织、高效，注重规则。", lover: "ESTJ, ISTJ, ENTJ, ESTP: 支持目标，有共同价值观，理解效率。"},
+  { type: "ENFJ", description: "主角，热情、富有同情心，善于社交。", lover: "ENFJ, INFJ, ESFP, ENFP: 情感共鸣，支持梦想，理解热情。"},
+           
+
+            // 添加其他 MBTI 类型...
+        ];
+
+        // 随机抽取 MBTI 类型
+        function drawMBTI() {
+            const randomIndex = Math.floor(Math.random() * mbtiData.length);
+            const result = mbtiData[randomIndex];
+            document.getElementById('mbti-result').innerHTML = `MBTI 类型：<strong>${result.type}</strong><br>性格描述：${result.description}<br>喜欢的爱人：${result.lover}`;
+        }
+    </script>
+
+</body>
+</html>
